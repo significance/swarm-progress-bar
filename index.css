@@ -2,6 +2,22 @@
 	display: none;
 }
 
+.invisible{
+    position: absolute;
+    opacity: 0;
+}
+
+.fades{
+	opacity: 1;	
+	transition: opacity 1s;
+}
+
+.fadeOut{
+	opacity: 0;
+	transition: opacity 1s;
+}
+
+
 * {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -92,6 +108,11 @@ a{
 .controlHeaderItemIcon svg{
 	height:20px;
 	fill: #FFA500;
+}
+
+#controlHeaderInfo .controlHeaderItemIcon{
+    top: 2px;
+    position: relative;
 }
 
 
@@ -206,6 +227,22 @@ a{
 	transition: opacity 1s;    
 }
 
+#uploadForm{
+	position: relative;
+}
+
+#uploadForm input[type="text"]{
+	pointer-events: none;
+}
+
+#uploadForm input[type="file"]{
+	position: absolute;
+  left: 0;
+  height: 38px;
+  width: 484px;
+  opacity: 0;
+}
+
 
 .uploadActions{
 	float: right;
@@ -230,14 +267,15 @@ a{
 
 .uploadFeedbackCounts{
 	float: left;
-	margin-bottom:10px;
-	margin-top:7px;
+	margin-bottom: 15px;
+    margin-top: 12px;
 }
 
 .uploadFeedbackCount{
 	float: left;
 	width:99px;
 	font-size:11px;
+	height: 24px;
 }
 
 .uploadFeedbackCountNumbers{
@@ -255,7 +293,7 @@ a{
 	position: absolute;
 	content: "";
 	width: 0px;
-	height: 50px;
+	height: 40px;
 	top: 0;
 	border-width: 0px 1px 0px 0px ;
 	border-color: lightgray;
@@ -293,6 +331,8 @@ a{
 	height: 8px;
 	margin-bottom: 2px;
 	z-index: 1;
+	transition: width 2s;
+	width: 0%
 }
 
 .uploadFeedbackColor1 {background-color: #7979F2;}

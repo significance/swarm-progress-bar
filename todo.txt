@@ -1,0 +1,8 @@
+- add favicon
+- add social media and other meta tags
+- error handling
+	- no network
+	- upload fails (at start, during) [different reasons]
+	- download fails ()
+- font awesome attributions
+- fix height
