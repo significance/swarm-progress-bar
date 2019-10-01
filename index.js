@@ -292,10 +292,8 @@ document.addEventListener('DOMContentLoaded', function(){
         let copyText = document.querySelector('#uploadLinkInput');
         copyText.select();
         copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-        // setTimeout(()=>{
-            document.execCommand("copy");
-            alert("Copied link to clipboard!");             
-        // },500);
+        document.execCommand("copy");
+        alert("Copied link to clipboard!");             
     })    
 
     document.querySelector('#uploadButtonHash').addEventListener('click', (e) => {
@@ -304,10 +302,8 @@ document.addEventListener('DOMContentLoaded', function(){
         let copyText = document.querySelector('#uploadHashInput');
         copyText.select();
         copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-        // setTimeout(()=>{
-            document.execCommand("copy");
-            alert("Copied hash to clipboard!"); 
-        // },500);
+        document.execCommand("copy");
+        alert("Copied hash to clipboard!"); 
     });
 
     document.querySelector('#controlHeaderDownload').addEventListener('click', (e) => {
@@ -333,12 +329,5 @@ document.addEventListener('DOMContentLoaded', function(){
         goToPage();
     });
 
-
-
-    // let uploadSelectField = document.querySelector('#uploadSelectField');
-    // form.addEventListener("click", (e)=>{
-    //     e.preventDefault();
-    //     console.log(this)
-    // }, false);
 }, false);
 
