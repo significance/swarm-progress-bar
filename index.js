@@ -326,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     document.querySelector('#downloadForm button').addEventListener('click', (e) => {
+        e.preventDefault();
         goToPage();
     });
 
