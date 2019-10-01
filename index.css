@@ -393,3 +393,14 @@ a{
 	clear: both;
 }
 
+.errorHeader, .errorMessage, .errorCode{
+	text-align: center;
+	width: 660px;
+	margin: auto;
+}
+
+.errorHeader h1{
+	font-family: urw_gothic_ldemi;
+	font-size: 20px;
+	color: #FFA500;
+}
