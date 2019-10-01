@@ -240,17 +240,17 @@ document.addEventListener('DOMContentLoaded', function(){
             let swb = new SwarmProgressBar('http://localhost:8500');
             swb.onProgress((status)=>{
                 let totalLength = status.Total.toString().length;
-                document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? `${padNumber(status.Received, 3)} / 100 %` : "";
-                document.querySelector('#uploadSentCount').innerHTML = status.Sent !== false ? `${padNumber(status.Sent, totalLength)} / ${status.Total}` : "";
-                document.querySelector('#uploadSplitCount').innerHTML = status.Split !== false ? `${padNumber(status.Split, totalLength)} / ${status.Total}` : "";
-                document.querySelector('#uploadSeenCount').innerHTML = status.Seen !== false ? `${padNumber(status.Seen, totalLength)} / ${status.Total}` : "";
-                document.querySelector('#uploadStoredCount').innerHTML = status.Stored !== false ? `${padNumber(status.Stored, totalLength)} / ${status.Total}` : "";
+                document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + " / 100 %" : "";
+                document.querySelector('#uploadSentCount').innerHTML = status.Sent !== false ? padNumber(status.Sent, totalLength) + " / " + status.Total : "";
+                document.querySelector('#uploadSplitCount').innerHTML = status.Split !== false ? padNumber(status.Split, totalLength) + " / " + status.Total : "";
+                document.querySelector('#uploadSeenCount').innerHTML = status.Seen !== false ? padNumber(status.Seen, totalLength) + " / " + status.Total : "";
+                document.querySelector('#uploadStoredCount').innerHTML = status.Stored !== false ? padNumber(status.Stored, totalLength) + " / " + status.Total : "";
 
-                document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? `width: ${status.Received}%` : "");
-                document.querySelector('#uploadSentBar').setAttribute('style', status.Sent !== false ? `width: ${Math.floor((status.Sent / status.Total) * 100, 2)}%` : "");
-                document.querySelector('#uploadSplitBar').setAttribute('style', status.Split !== false ? `width: ${Math.floor((status.Split / status.Total) * 100, 2)}%` : "");
-                document.querySelector('#uploadSeenBar').setAttribute('style', status.Seen !== false ? `width: ${Math.floor((status.Seen / status.Total) * 100, 2)}%` : "");
-                document.querySelector('#uploadStoredBar').setAttribute('style', status.Stored !== false ? `width: ${Math.floor((status.Stored / status.Total) * 100, 2)}%` : "");
+                document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? "width: "+ status.Received + "%" : "");
+                document.querySelector('#uploadSentBar').setAttribute('style', status.Sent !== false ? "width: "+ Math.floor((status.Sent / status.Total) * 100, 2) + "%" : "");
+                document.querySelector('#uploadSplitBar').setAttribute('style', status.Split !== false ? "width: "+ Math.floor((status.Split / status.Total) * 100, 2) + "%" : "");
+                document.querySelector('#uploadSeenBar').setAttribute('style', status.Seen !== false ? "width: "+ Math.floor((status.Seen / status.Total) * 100, 2) + "%" : "");
+                document.querySelector('#uploadStoredBar').setAttribute('style', status.Stored !== false ? "width: "+ Math.floor((status.Stored / status.Total) * 100, 2) + "%" : "");
 
             });
             swb.onStart((event)=>{
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function(){
             })
             swb.onUploaded((response)=>{
                 document.querySelector('#uploadStatusMessage').innerHTML = "Uploaded";                    
-                document.querySelector('#uploadSwarmhash').innerHTML = swb.status.swarmHash !== false ? `to <em>${truncateEnd(swb.status.swarmHash, 14)}</em>` : "";    
+                document.querySelector('#uploadSwarmhash').innerHTML = swb.status.swarmHash !== false ? "to <em>" + truncateEnd(swb.status.swarmHash, 14) + "</em>" : "";    
                 document.querySelector('#uploadButtonLink').classList.remove("fadeOut");
                 document.querySelector('#uploadLinkInput').value = swb.status.gatewayLink;
                 document.querySelector('#uploadButtonHash').classList.remove("fadeOut");                
@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if(e.target.files.length > 0){
             fadeAndReplace(
                 '#uploadComponent .controlComponentMessage', 
-                `Upload '${truncateEnd(e.target.files[0].name,50)}' (${humanFileSize(e.target.files[0].size)})?`
+                "Upload '" + truncateEnd(e.target.files[0].name,50) + "' (" + humanFileSize(e.target.files[0].size) +") ?"
                 );
             uploadSelectedFile.value = truncateEnd(e.target.files[0].name, 96);
         }else{
