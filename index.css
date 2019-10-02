@@ -13,6 +13,7 @@
 }
 
 .fadeOut{
+	pointer-events: none;
 	opacity: 0;
 	transition: opacity 1s;
 }
@@ -116,7 +117,8 @@ a{
 	fill: #FFA500;
 }
 
-#controlHeaderInfo .controlHeaderItemIcon{
+#controlHeaderInfo .controlHeaderItemIcon,
+#controlHeaderDownload .controlHeaderItemIcon{
 	top: 2px;
 	position: relative;
 }
