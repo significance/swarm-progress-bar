@@ -42,7 +42,7 @@ class SwarmProgressBar {
 
 		let url = this.gateway + '/bzz:/';
 
-        let uploadURL = url + '?defaultpath=' + formData.get('file').name;
+		let uploadURL = url + '?defaultpath=' + formData.get('file').name;
 
 		return this.sendUploadRequest(uploadURL, 'POST', 'text', formData, formData.get('file').size).then((response) => {
 			let swarmHash = response.responseText;
@@ -176,6 +176,10 @@ class SwarmProgressBar {
 		this.onUploadedCallback = fn;
 	}
 
+	cancel(){
+		clearInterval(this.checkProgressInterval);
+	}
+
 }
 
 let humanFileSize = (size) => {
@@ -216,15 +220,15 @@ let fadeInComponent = (headerSelectorIn, selectorIn, time=600) => {
 	let elementIn = document.querySelector(selectorIn);    
 	let headerIn = document.querySelector(headerSelectorIn);    
 
-    if(headerSelectorIn){
-        headerIn.classList.add("active");
-    }
+	if(headerSelectorIn){
+		headerIn.classList.add("active");
+	}
 
 	for (var i = components.length - 1; i >= 0; i--) {
 		if(components[i][1] !== selectorIn){
-            if(headerSelectorIn){
-    			document.querySelector(components[i][0]).classList.remove("active");
-            }
+			if(headerSelectorIn){
+				document.querySelector(components[i][0]).classList.remove("active");
+			}
 			document.querySelector(components[i][1]).classList.add("fadeOut");
 		}
 	}
@@ -256,27 +260,28 @@ let goToPage = () => {
 }
 
 let copyHashAction = (e) => {
-    e.preventDefault();
+	e.preventDefault();
 
-    let copyText = document.querySelector('#uploadHashInput');
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-    document.execCommand("copy");
-    alert("Copied Swarm hash to clipboard!"); 
+	let copyText = document.querySelector('#uploadHashInput');
+	copyText.select();
+	copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+	document.execCommand("copy");
+	alert("Copied Swarm hash to clipboard!"); 
 };
 
 
 let copyLinkAction = (e) => {
-    e.preventDefault();
+	e.preventDefault();
 
-    let copyText = document.querySelector('#uploadLinkInput');
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-    document.execCommand("copy");
-    alert("Copied link to clipboard!");             
+	let copyText = document.querySelector('#uploadLinkInput');
+	copyText.select();
+	copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+	document.execCommand("copy");
+	alert("Copied link to clipboard!");             
 };
 
 let isUploading = false;
+let currentProgressBar = null;
 
 document.addEventListener('DOMContentLoaded', function(){ 
 	let form = document.querySelector('#uploadForm');
@@ -284,6 +289,10 @@ document.addEventListener('DOMContentLoaded', function(){
 	let uploadFeedbackComponent = document.querySelector('#uploadFeedbackComponent');
 	form.addEventListener("submit", (e)=>{
 		e.preventDefault();
+
+		if(currentProgressBar){
+			currentProgressBar.cancel();
+		}
 
 		if(document.querySelector('#uploadSelectFile').value === ""){
 			return false;
@@ -295,14 +304,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		isUploading = true;
 
-        document.querySelector('#uploadHashInput').classList.add('hidden');
-
 		let formData = new FormData(form);
 
 		document.querySelector('#uploadFilename').innerHTML = truncateEnd(formData.get('file').name, 40);
 
 		if(formData.get('file')){
-			let swb = new SwarmProgressBar(gatewayHost);
+			swb = new SwarmProgressBar(gatewayHost);
+			currentProgressBar = swb;
 			swb.onProgress((status)=>{
 				let totalLength = status.Total.toString().length;
 				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "/100%" : "";
@@ -353,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	document.querySelector('#uploadButtonLink').addEventListener('click', copyLinkAction)   ; 
 
-    document.querySelector('#uploadSwarmhash').addEventListener('click', copyHashAction);
+	document.querySelector('#uploadSwarmhash').addEventListener('click', copyHashAction);
 	document.querySelector('#uploadButtonHash').addEventListener('click', copyHashAction);
 
 	document.querySelector('#controlHeaderDownload').addEventListener('click', (e) => {
@@ -371,8 +379,10 @@ document.addEventListener('DOMContentLoaded', function(){
 	document.querySelector('#uploadCancelButton').addEventListener('click', (e) => {
 		document.querySelector('#uploadSelectFile').value = "";
 		document.querySelector('#uploadSelectedFile').value = "";
-        document.querySelector('#uploadHashInput').classList.remove('hidden');
+		document.querySelector('#uploadHashInput').classList.remove('hidden');
 		document.querySelector('#uploadComponent .controlComponentMessage').innerHTML = "Select your file to upload it to the Swarm network.";
+		isUploading = false;
+		currentProgressBar.cancel();
 		fadeInComponent('#controlHeaderUpload', '#uploadComponent');     
 	});
 
