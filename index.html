@@ -199,7 +199,7 @@
 						<input type="text" id="uploadSelectedFile" name="uploadSelected" placeholder="select file or directory..."/>
 						<input type="file" id="uploadSelectFile" name="file"/>
 						<!-- inline js used to deal with browser security restrictions -->
-						<button type="submit" value="Upload File" class="orangeButton wideButton" onclick="if(document.querySelector('#uploadSelectFile').value === '')document.querySelector('#uploadSelectFile').click();" >
+						<button title="Upload a file to Swarm." type="submit" value="Upload File" class="orangeButton wideButton" onclick="if(document.querySelector('#uploadSelectFile').value === '')document.querySelector('#uploadSelectFile').click();" >
 							Upload
 							<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 								 viewBox="0 0 16 20" style="enable-background:new 0 0 16 20;" xml:space="preserve">
@@ -222,7 +222,7 @@
 					</div>
 					<div class="uploadActions">
 						<div class="uploadAction">
-							<button id="uploadCancelButton" class="uploadCancelButton" title="Cancel Upload">
+							<button id="uploadCancelButton" class="uploadCancelButton" title="Cancel upload">
 								<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 									 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 								<path id="XMLID_1460_" d="M50,3.7C24.4,3.7,3.7,24.4,3.7,50S24.4,96.3,50,96.3S96.3,75.6,96.3,50S75.6,3.7,50,3.7z

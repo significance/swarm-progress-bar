@@ -334,7 +334,10 @@ document.addEventListener('DOMContentLoaded', function(){
 			})
 			swb.onUploaded((response)=>{
 				document.querySelector('#uploadStatusMessage').innerHTML = "Uploaded";                    
-				document.querySelector('#uploadSwarmhash').innerHTML = swb.status.swarmHash !== false ? swb.status.swarmHash : "";    
+				fadeAndReplace(
+					'#uploadSwarmhash', 
+					swb.status.swarmHash !== false ? swb.status.swarmHash : ""
+				);
 				document.querySelector('#uploadButtonLink').classList.remove("fadeOut");
 				document.querySelector('#uploadLinkInput').value = swb.status.gatewayLink;
 				document.querySelector('#uploadButtonHash').classList.remove("fadeOut");                
