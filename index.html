@@ -115,7 +115,7 @@
 				Censorship resistant storage and communication infrastructure for a sovereign digital society.
 			</div>
 		</div>
-			<!-- begin content -->		
+		<!-- begin content -->		
 		<div class="control">
 			<div class="controlHeader">
 				<div id="controlHeaderDownload" class="controlHeaderItem">
@@ -151,7 +151,7 @@
 						</span>
 					</a>
 				</div>
-				<div id="controlHeaderInfo" class="controlHeaderItem">
+				<div id="controlHeaderInfo" class="controlHeaderItem hidden">
 					<a href="#">
 						<span class="controlHeaderItemTitle">Info</span>
 						<span class="controlHeaderItemIcon">
@@ -173,7 +173,7 @@
 					</div>
 					<form id="downloadForm" spellcheck="false">
 						<input type="text" id="downloadHashField" name="downloadHash" placeholder="theswarm.eth"/>
-						<button type="submit" value="Go" class="orangeButton">
+						<button type="submit" value="Go" class="orangeButton wideButton">
 							Go
 							<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 								 viewBox="0 0 20 20" style="enable-background:new 0 0 16 20;" xml:space="preserve">
@@ -198,7 +198,8 @@
 					<form id="uploadForm" enctype="multipart/form-data" spellcheck="false">
 						<input type="text" id="uploadSelectedFile" name="uploadSelected" placeholder="select file or directory..."/>
 						<input type="file" id="uploadSelectFile" name="file"/>
-						<button type="submit" value="Upload File" class="orangeButton">
+						<!-- inline js used to deal with browser security restrictions -->
+						<button type="submit" value="Upload File" class="orangeButton wideButton" onclick="if(document.querySelector('#uploadSelectFile').value === '')document.querySelector('#uploadSelectFile').click();" >
 							Upload
 							<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 								 viewBox="0 0 16 20" style="enable-background:new 0 0 16 20;" xml:space="preserve">
@@ -211,11 +212,17 @@
 					</form>
 				</div>
 				<div class="controlComponent fades hidden" id="uploadFeedbackComponent">
-					<div id="uploadTextFeedback" class="controlComponentMessage"><span id="uploadStatusMessage">Uploading</span> <span id="uploadFilename"></span> <span id="uploadSwarmhash"></span></div>
+					<div id="uploadTextFeedback" class="controlComponentMessage">
+						<div class="">
+							<span id="uploadStatusMessage">Uploading</span> <span id="uploadFilename"></span>
+						</div>
+						<div class="uploadTextFeedbackSub">
+							<span id="uploadSwarmhash"><i>Waiting for hash...</i></span>
+						</div>
+					</div>
 					<div class="uploadActions">
 						<div class="uploadAction">
-							<button id="uploadCancelButton" class="uploadCancelButton">
-								Cancel
+							<button id="uploadCancelButton" class="uploadCancelButton" title="Cancel Upload">
 								<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 									 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 								<path id="XMLID_1460_" d="M50,3.7C24.4,3.7,3.7,24.4,3.7,50S24.4,96.3,50,96.3S96.3,75.6,96.3,50S75.6,3.7,50,3.7z
@@ -226,8 +233,7 @@
 							</button>
 						</div>
 						<div class="uploadAction">
-							<button id="uploadButtonLink" class="orangeButton fadeOut">
-								Link
+							<button id="uploadButtonLink" class="orangeButton fadeOut" title="Copy link to clipboard.">
 								<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 									 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 								<path id="XMLID_2806_" d="M12.4,7.8c2,2,2,5.3,0,7.2c0,0,0,0,0,0l-2.3,2.3c-2,2-5.3,2-7.3,0c-2-2-2-5.3,0-7.3l1.3-1.3
@@ -240,11 +246,9 @@
 								</svg>
 
 							</button>
-							<input type="text" id="uploadLinkInput" class="invisible"/>
 						</div>
 						<div class="uploadAction">
-							<button id="uploadButtonHash" class="orangeButton fadeOut">
-								Hash
+							<button id="uploadButtonHash" class="orangeButton fadeOut" title="Copy hash to clipboard.">
 								<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 									 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 								<path id="XMLID_2810_" d="M18.9,6.9l0.3-1.7c0.1-0.3-0.2-0.6-0.5-0.6h-3.1l0.6-3.4c0.1-0.3-0.2-0.6-0.5-0.6h-1.7
@@ -255,32 +259,33 @@
 									l0.9-5.3h4.1L11.6,12.6z"/>
 								</svg>
 							</button>
-							<input type="text" id="uploadHashInput" class="invisible"/>
 						</div>
+					</div>
+					<div id="uploadFeedbackBarsWrapper">
+						<div id="uploadFeedbackBars">
+							<div class="uploadFeedbackBar uploadFeedbackColor1" id="uploadReceivedBar"></div>
+							<div class="uploadFeedbackBar uploadFeedbackColorx hidden" id="uploadSeenBar"></div>							
+							<div class="uploadFeedbackBar uploadFeedbackColor2" id="uploadSplitBar"></div>
+							<div class="uploadFeedbackBar uploadFeedbackColor3" id="uploadStoredBar"></div>
+							<div class="uploadFeedbackBar uploadFeedbackColor4" id="uploadSentBar"></div>							
+						</div>
+						<div class="incrementLine incrementLine1"></div>
+						<div class="incrementLine incrementLine2"></div>
+						<div class="incrementLine incrementLine3"></div>
 					</div>
 					<div class="uploadFeedbackCounts">
-						<div class="uploadFeedbackCount uploadFeedbackCountColor1">Received <span class="uploadFeedbackCountNumbers" id="uploadReceivedCount"></span></div>
-						<div class="uploadFeedbackCount uploadFeedbackCountColor2">Sent <span class="uploadFeedbackCountNumbers" id="uploadSentCount"></span></div>
+						<div class="uploadFeedbackCount uploadFeedbackCountColor1">Got <span class="uploadFeedbackCountNumbers" id="uploadReceivedCount"></span></div>
+						<div class="uploadFeedbackCount uploadFeedbackCountColor2">Stored <span class="uploadFeedbackCountNumbers" id="uploadStoredCount"></span></div>
+						<div class="uploadFeedbackCount uploadFeedbackCountColor3 hidden">Seen <span class="uploadFeedbackCountNumbers" id="uploadSeenCount"></span></div>						
 						<div class="uploadFeedbackCount uploadFeedbackCountColor3">Split <span class="uploadFeedbackCountNumbers" id="uploadSplitCount"></span></div>
-						<div class="uploadFeedbackCount uploadFeedbackCountColor4">Seen <span class="uploadFeedbackCountNumbers" id="uploadSeenCount"></span></div>
-						<div class="uploadFeedbackCount uploadFeedbackCountColor5">Stored <span class="uploadFeedbackCountNumbers" id="uploadStoredCount"></span></div>
-					</div>
-						<div id="uploadFeedbackBarsWrapper">
-							<div id="uploadFeedbackBars">
-								<div class="uploadFeedbackBar uploadFeedbackColor1" id="uploadReceivedBar"></div>
-								<div class="uploadFeedbackBar uploadFeedbackColor2 hidden" id="uploadSentBar"></div>
-								<div class="uploadFeedbackBar uploadFeedbackColor3" id="uploadSplitBar"></div>
-								<div class="uploadFeedbackBar uploadFeedbackColor4" id="uploadSeenBar"></div>
-								<div class="uploadFeedbackBar uploadFeedbackColor5" id="uploadStoredBar"></div>
-							</div>
-							<div class="incrementLine incrementLine1"></div>
-							<div class="incrementLine incrementLine2"></div>
-							<div class="incrementLine incrementLine3"></div>
-						</div>
+						<div class="uploadFeedbackCount uploadFeedbackCountColor5">Sent <span class="uploadFeedbackCountNumbers" id="uploadSentCount"></span>
 					</div>
 				</div>
+				<div class="clearBoth"></div>
 			</div>
 		</div>
+		<input type="text" id="uploadLinkInput" class="invisible"/>
+		<input type="text" id="uploadHashInput" class="invisible"/>
 		<!-- end content -->
 		<div class="footer">
 			<div class="footerItems">
@@ -373,7 +378,7 @@
 					</a>
 				</div>
 				<div class="footerItem">
-					<a href="/bzz:/ethereum.eth" target="_blank" rel="noopener noreferrer">
+					<a href="https://ethereum.org" target="_blank" rel="noopener noreferrer">
 						<div class="footerItemLogo">
 						<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 							 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
@@ -397,7 +402,7 @@
 						</svg>
 						</div>
 						<div class="footerItemLink">
-							ethereum.eth
+							ethereum.org
 						</div>
 					</a>
 				</div>

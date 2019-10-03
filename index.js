@@ -1,8 +1,8 @@
-// let gatewayHost = 'https://localhost:8500';
+let gatewayHost = 'http://localhost:8500';
 // let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
 
 
-let gatewayHost = window.location.protocol+"//"+window.location.hostname+(window.location.port ? ":"+window.location.port : "");
+// let gatewayHost = window.location.protocol+"//"+window.location.hostname+(window.location.port ? ":"+window.location.port : "");
 
 class SwarmProgressBar {
 	constructor(gateway){
@@ -42,7 +42,9 @@ class SwarmProgressBar {
 
 		let url = this.gateway + '/bzz:/';
 
-		return this.sendUploadRequest(url, 'POST', 'text', formData, formData.get('file').size).then((response) => {
+        let uploadURL = url + '?defaultpath=' + formData.get('file').name;
+
+		return this.sendUploadRequest(uploadURL, 'POST', 'text', formData, formData.get('file').size).then((response) => {
 			let swarmHash = response.responseText;
 			this.setStatus({swarmHash: swarmHash});      
 			this.setStatus({gatewayLink: url + swarmHash + "/" + formData.get('file').name});
@@ -79,7 +81,7 @@ class SwarmProgressBar {
 				if(this.onProgressCallback){
 					this.onProgressCallback(this.status);
 				}
-				if(responseData.Total === responseData.Stored){
+				if(responseData.Total === responseData.Sent){
 					this.isCompleted = true;
 					clearInterval(this.checkProgressInterval);
 				}
@@ -113,12 +115,11 @@ class SwarmProgressBar {
 			}
 
 			xhr.upload.onprogress = (event) => {
-				console.log('e', event.loaded, dataLength)
 				let received;
 				if(event.loaded > dataLength){
 					received = 100;
 				}else{
-					received = Math.floor((event.loaded / dataLength) * 100, 2);
+					received = Math.floor((event.loaded/dataLength) * 100, 2);
 				}
 				this.setStatus({Received: received});
 			};
@@ -136,7 +137,7 @@ class SwarmProgressBar {
 
 	}
 
-	sendRequest(url, requestType, responseType = 'text', data, dataLength, onReadyStateChange) {
+	sendRequest(url, requestType, responseType = 'text', data, dataLength) {
 		return new Promise((resolve,reject) => {
 			let xhr = new XMLHttpRequest();
 
@@ -178,8 +179,8 @@ class SwarmProgressBar {
 }
 
 let humanFileSize = (size) => {
-	var i = Math.floor( Math.log(size) / Math.log(1024) );
-	return ( size / Math.pow(1024, i) ).toFixed(0) * 1 + ' ' + ['bytes', 'kb', 'mb', 'gb', 'tb'][i];
+	var i = Math.floor( Math.log(size)/Math.log(1024) );
+	return ( size/Math.pow(1024, i) ).toFixed(0) * 1 + ' ' + ['bytes', 'kb', 'mb', 'gb', 'tb'][i];
 };
 
 
@@ -215,11 +216,15 @@ let fadeInComponent = (headerSelectorIn, selectorIn, time=600) => {
 	let elementIn = document.querySelector(selectorIn);    
 	let headerIn = document.querySelector(headerSelectorIn);    
 
-	headerIn.classList.add("active");        
+    if(headerSelectorIn){
+        headerIn.classList.add("active");
+    }
 
 	for (var i = components.length - 1; i >= 0; i--) {
 		if(components[i][1] !== selectorIn){
-			document.querySelector(components[i][0]).classList.remove("active");
+            if(headerSelectorIn){
+    			document.querySelector(components[i][0]).classList.remove("active");
+            }
 			document.querySelector(components[i][1]).classList.add("fadeOut");
 		}
 	}
@@ -250,6 +255,27 @@ let goToPage = () => {
   location.href = address;
 }
 
+let copyHashAction = (e) => {
+    e.preventDefault();
+
+    let copyText = document.querySelector('#uploadHashInput');
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+    document.execCommand("copy");
+    alert("Copied Swarm hash to clipboard!"); 
+};
+
+
+let copyLinkAction = (e) => {
+    e.preventDefault();
+
+    let copyText = document.querySelector('#uploadLinkInput');
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+    document.execCommand("copy");
+    alert("Copied link to clipboard!");             
+};
+
 let isUploading = false;
 
 document.addEventListener('DOMContentLoaded', function(){ 
@@ -269,36 +295,38 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		isUploading = true;
 
+        document.querySelector('#uploadHashInput').classList.add('hidden');
+
 		let formData = new FormData(form);
 
-		document.querySelector('#uploadFilename').innerHTML = truncateEnd(formData.get('file').name, 25);
+		document.querySelector('#uploadFilename').innerHTML = truncateEnd(formData.get('file').name, 40);
 
 		if(formData.get('file')){
 			let swb = new SwarmProgressBar(gatewayHost);
 			swb.onProgress((status)=>{
 				let totalLength = status.Total.toString().length;
-				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + " / 100 %" : "";
-				document.querySelector('#uploadSentCount').innerHTML = status.Sent !== false ? padNumber(status.Sent, totalLength) + " / " + status.Total : "";
-				document.querySelector('#uploadSplitCount').innerHTML = status.Split !== false ? padNumber(status.Split, totalLength) + " / " + status.Total : "";
-				document.querySelector('#uploadSeenCount').innerHTML = status.Seen !== false ? padNumber(status.Seen, totalLength) + " / " + status.Total : "";
-				document.querySelector('#uploadStoredCount').innerHTML = status.Stored !== false ? padNumber(status.Stored, totalLength) + " / " + status.Total : "";
+				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "/100%" : "";
+				document.querySelector('#uploadSentCount').innerHTML = status.Sent !== false ? padNumber(status.Sent, totalLength) + "/" + status.Total : "";
+				document.querySelector('#uploadSplitCount').innerHTML = status.Split !== false ? padNumber(status.Split, totalLength) + "/" + status.Total : "";
+				document.querySelector('#uploadSeenCount').innerHTML = status.Seen !== false ? padNumber(status.Seen, totalLength) + "/" + status.Total : "";
+				document.querySelector('#uploadStoredCount').innerHTML = status.Stored !== false ? padNumber(status.Stored, totalLength) + "/" + status.Total : "";
 
 				document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? "width: "+ status.Received + "%" : "");
-				document.querySelector('#uploadSentBar').setAttribute('style', status.Sent !== false ? "width: "+ Math.floor((status.Sent / status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadSplitBar').setAttribute('style', status.Split !== false ? "width: "+ Math.floor((status.Split / status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadSeenBar').setAttribute('style', status.Seen !== false ? "width: "+ Math.floor((status.Seen / status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadStoredBar').setAttribute('style', status.Stored !== false ? "width: "+ Math.floor((status.Stored / status.Total) * 100, 2) + "%" : "");
+				document.querySelector('#uploadSentBar').setAttribute('style', status.Sent !== false ? "width: "+ Math.floor((status.Sent/status.Total) * 100, 2) + "%" : "");
+				document.querySelector('#uploadSplitBar').setAttribute('style', status.Split !== false ? "width: "+ Math.floor((status.Split/status.Total) * 100, 2) + "%" : "");
+				document.querySelector('#uploadSeenBar').setAttribute('style', status.Seen !== false ? "width: "+ Math.floor((status.Seen/status.Total) * 100, 2) + "%" : "");
+				document.querySelector('#uploadStoredBar').setAttribute('style', status.Stored !== false ? "width: "+ Math.floor((status.Stored/status.Total) * 100, 2) + "%" : "");
 
 			});
 			swb.onStart((event)=>{
-				fadeInComponent('#controlHeaderInfo', '#uploadFeedbackComponent')
+				fadeInComponent(false, '#uploadFeedbackComponent')
 			})
 			swb.onError((event)=>{
 				console.log('error', event);
 			})
 			swb.onUploaded((response)=>{
 				document.querySelector('#uploadStatusMessage').innerHTML = "Uploaded";                    
-				document.querySelector('#uploadSwarmhash').innerHTML = swb.status.swarmHash !== false ? "to <em>" + truncateEnd(swb.status.swarmHash, 14) + "</em>" : "";    
+				document.querySelector('#uploadSwarmhash').innerHTML = swb.status.swarmHash !== false ? swb.status.swarmHash : "";    
 				document.querySelector('#uploadButtonLink').classList.remove("fadeOut");
 				document.querySelector('#uploadLinkInput').value = swb.status.gatewayLink;
 				document.querySelector('#uploadButtonHash').classList.remove("fadeOut");                
@@ -323,25 +351,10 @@ document.addEventListener('DOMContentLoaded', function(){
 		}
 	}, false);
 
-	document.querySelector('#uploadButtonLink').addEventListener('click', (e) => {
-		e.preventDefault();
+	document.querySelector('#uploadButtonLink').addEventListener('click', copyLinkAction)   ; 
 
-		let copyText = document.querySelector('#uploadLinkInput');
-		copyText.select();
-		copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-		document.execCommand("copy");
-		alert("Copied link to clipboard!");             
-	})    
-
-	document.querySelector('#uploadButtonHash').addEventListener('click', (e) => {
-		e.preventDefault();
-
-		let copyText = document.querySelector('#uploadHashInput');
-		copyText.select();
-		copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-		document.execCommand("copy");
-		alert("Copied hash to clipboard!"); 
-	});
+    document.querySelector('#uploadSwarmhash').addEventListener('click', copyHashAction);
+	document.querySelector('#uploadButtonHash').addEventListener('click', copyHashAction);
 
 	document.querySelector('#controlHeaderDownload').addEventListener('click', (e) => {
 		fadeInComponent('#controlHeaderDownload', '#downloadComponent')        
@@ -358,6 +371,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	document.querySelector('#uploadCancelButton').addEventListener('click', (e) => {
 		document.querySelector('#uploadSelectFile').value = "";
 		document.querySelector('#uploadSelectedFile').value = "";
+        document.querySelector('#uploadHashInput').classList.remove('hidden');
 		document.querySelector('#uploadComponent .controlComponentMessage').innerHTML = "Select your file to upload it to the Swarm network.";
 		fadeInComponent('#controlHeaderUpload', '#uploadComponent');     
 	});

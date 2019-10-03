@@ -35,7 +35,7 @@ input:-internal-autofill-selected {
 	outline: none;
 }
 
-.clearBoth:after{
+.clearBoth{
 	visibility: hidden;
 	display: block;
 	content: "";
@@ -180,7 +180,7 @@ a{
 	height: 20px;
 	float: right;
 	fill: white;
-	top: 2px;
+	top: 0px;
 	right: 3px;
 	position: relative;
 }
@@ -190,10 +190,9 @@ a{
 	display: block;
 	position: absolute;
 	top: -6px;
-	/* bottom: 0; */
+	width: 112px;
 	left: -6px;
 	border-radius: 9px;
-	width: 113px;
 	height: 40px;
 	opacity:0;
 	transition: opacity 0.3s;
@@ -215,6 +214,14 @@ a{
 	border: 1px solid #FFA500;
 	opacity: 0.5;
 	transition: opacity 1s;
+}
+
+.controlMain .uploadAction button{
+	width: 34px;
+}
+
+.controlMain .uploadAction button::after{
+	width: 43px;
 }
 
 
@@ -258,43 +265,58 @@ a{
 }
 
 .uploadAction{
-	margin-bottom: 9px;
+	margin-left: 9px;
+	float: right;
 }
 
 #uploadTextFeedback{
+	margin-left: 2px;
 	float:left;
+}
+
+.uploadTextFeedbackSub{
+	margin-top: 2px;
 }
 
 #uploadFilename{
 	font-weight: bold;
 }
 
-#uploadSwarmhash{
-	font-weight: bold;
+#uploadSwarmhash {
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#uploadSwarmhash i{
+	font-size: normal;
+	font-style: italic;
 }
 
 .uploadFeedbackCounts{
 	float: left;
-	margin-bottom: 15px;
-	margin-top: 12px;
+	margin-left: 5px;
+	width: 125px;
 }
 
 .uploadFeedbackCount{
 	float: left;
-	width:99px;
-	font-size:11px;
-	height: 24px;
+	width: 120px;
+	font-size: 11px;
+	height: 11px;
+	margin-bottom: 2px;
+	font-weight: bold;
 }
 
 .uploadFeedbackCountNumbers{
-	display: block;
+	float: right;
 	font-family: "Courier New", Courier, monospace;
 }
 
 #uploadFeedbackBarsWrapper{
 	position: relative;
 	clear: left;
-	width: 484px;
+	width: 472px;
 }
 
 #uploadFeedbackBarsWrapper .incrementLine{
@@ -325,22 +347,23 @@ a{
 
 #uploadFeedbackBars{
 	position: relative;
-	clear: left;
+	float: left;
 	width: 100%;
 	border-width: 0px 1px;
 	border-color: lightgray;
 	border-style: solid;
 	padding: 1px;
 	z-index: 2;
+	background: #ECF6FF;
 }
 
 
 #uploadFeedbackBars .uploadFeedbackBar{
-	height: 8px;
+	height: 11px;
 	margin-bottom: 2px;
 	z-index: 1;
 	transition: width 2s;
-	width: 0%
+	width: 0;
 }
 
 .uploadFeedbackColor1 {background-color: #7979F2;}
@@ -355,10 +378,17 @@ a{
 .uploadFeedbackCountColor4 {color: #1A00BF;}
 .uploadFeedbackCountColor5 {color: #150194;}
 
-#uploadReceivedBar {
+.uploadFeedbackShare {
+	clear:both;
 }
 
+.uploadFeedbackShareLink {
+	
+}
 
+.uploadFeedbackShareButton {
+
+}
 
 .footer{
 	position: absolute;
