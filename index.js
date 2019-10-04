@@ -1,5 +1,5 @@
-let gatewayHost = 'http://localhost:8500';
-// let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
+// let gatewayHost = 'http://localhost:8500';
+let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
 
 
 // let gatewayHost = window.location.protocol+"//"+window.location.hostname+(window.location.port ? ":"+window.location.port : "");
@@ -291,10 +291,16 @@ document.addEventListener('DOMContentLoaded', function(){
 	let resetUpload = () => {
 		document.querySelector('#uploadSelectFile').value = "";
 		document.querySelector('#uploadSelectedFile').value = "";
+		document.querySelector('#uploadSwarmhash').innerHTML = "Waiting for hash...";
 		document.querySelector('#uploadHashInput').classList.remove('hidden');
+		document.querySelector('#uploadButtonHash').classList.add('fadeOut');
+		document.querySelector('#uploadButtonLink').classList.add('fadeOut');
+
 		document.querySelector('#uploadComponent .controlComponentMessage').innerHTML = "Select your file to upload it to the Swarm network.";
 		isUploading = false;
-		currentProgressBar.cancel();	
+		if(currentProgressBar !== null){
+			currentProgressBar.cancel();			
+		}
 	}
 
 	form.addEventListener("submit", (e)=>{
@@ -316,25 +322,40 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		let formData = new FormData(form);
 
-		document.querySelector('#uploadFilename').innerHTML = truncateEnd(formData.get('file').name, 40);
+		document.querySelector('#uploadFilename').innerHTML = truncateEnd(formData.get('file').name, 45);
 
 		if(formData.get('file')){
 			swb = new SwarmProgressBar(gatewayHost);
 			currentProgressBar = swb;
 			swb.onProgress((status)=>{
 				let totalLength = status.Total.toString().length;
+				let syncedString = "";
+				let syncedPercent = 0;
+
+				if(
+					status.Synced !== false &&
+					status.Total !== false && 
+					status.Seen !== false
+				){
+					if(
+						status.Total - ( status.Synced + status.Seen ) > 0
+					){
+						syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+(status.Total - status.Seen).toString()+' chunks</span>';
+					}else{
+						syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+(status.Total).toString()+' chunks</span>';						
+					}
+					if(status.Total - status.Seen > 0){
+						syncedPercent = Math.ceil((status.Synced/(status.Total - status.Seen)) * 100, 2);				
+					}else{
+						syncedPercent = 100;
+					}
+				}
+
 				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "/100%" : "";
-				document.querySelector('#uploadSentCount').innerHTML = status.Sent !== false ? padNumber(status.Sent, totalLength) + "/" + status.Total : "";
-				document.querySelector('#uploadSplitCount').innerHTML = status.Split !== false ? padNumber(status.Split, totalLength) + "/" + status.Total : "";
-				document.querySelector('#uploadSeenCount').innerHTML = status.Seen !== false ? padNumber(status.Seen, totalLength) + "/" + status.Total : "";
-				document.querySelector('#uploadStoredCount').innerHTML = status.Stored !== false ? padNumber(status.Stored, totalLength) + "/" + status.Total : "";
+				document.querySelector('#uploadSyncedCount').innerHTML = syncedString;
 
 				document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? "width: "+ status.Received + "%" : "");
-				document.querySelector('#uploadSentBar').setAttribute('style', status.Sent !== false ? "width: "+ Math.floor((status.Sent/status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadSplitBar').setAttribute('style', status.Split !== false ? "width: "+ Math.floor((status.Split/status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadSeenBar').setAttribute('style', status.Seen !== false ? "width: "+ Math.floor((status.Seen/status.Total) * 100, 2) + "%" : "");
-				document.querySelector('#uploadStoredBar').setAttribute('style', status.Stored !== false ? "width: "+ Math.floor((status.Stored/status.Total) * 100, 2) + "%" : "");
-
+				document.querySelector('#uploadSyncedBar').setAttribute('style', status.Synced !== false ? "width: "+ syncedPercent + "%" : "");
 			});
 			swb.onStart((event)=>{
 				fadeInComponent(false, '#uploadFeedbackComponent')
