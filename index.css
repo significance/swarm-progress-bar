@@ -102,6 +102,7 @@ a{
 }
 
 .controlHeaderItem a{
+	cursor: pointer;
 	font-family: urw_gothic_ldemi;
 	font-size: 20px;
 

@@ -253,7 +253,7 @@ let fadeInComponent = (headerSelectorIn, selectorIn, time=600) => {
 let goToPage = () => {
   var page = document.getElementById('downloadHashField').value;
   if (page == "") {
-	var page = "theswarm.eth"
+	return false;
   }
   var address = "/bzz:/" + page;
   location.href = address;
@@ -337,17 +337,19 @@ document.addEventListener('DOMContentLoaded', function(){
 					status.Total !== false && 
 					status.Seen !== false
 				){
-					if(
-						status.Total - ( status.Synced + status.Seen ) > 0
-					){
-						syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+(status.Total - status.Seen).toString()+' chunks</span>';
-					}else{
-						syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+(status.Total).toString()+' chunks</span>';						
-					}
+
 					if(status.Total - status.Seen > 0){
 						syncedPercent = Math.ceil((status.Synced/(status.Total - status.Seen)) * 100, 2);				
 					}else{
 						syncedPercent = 100;
+					}
+
+					if(
+						status.Total - ( status.Synced + status.Seen ) > 0
+					){
+						syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
+					}else{
+						syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
 					}
 				}
 
@@ -395,7 +397,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	document.querySelector('#uploadButtonLink').addEventListener('click', copyLinkAction)   ; 
 
-	document.querySelector('#uploadSwarmhash').addEventListener('click', copyHashAction);
 	document.querySelector('#uploadButtonHash').addEventListener('click', copyHashAction);
 
 	document.querySelector('#controlHeaderDownload').addEventListener('click', (e) => {
