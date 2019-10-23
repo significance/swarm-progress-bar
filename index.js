@@ -81,7 +81,7 @@ class SwarmProgressBar {
 				if(this.onProgressCallback){
 					this.onProgressCallback(this.status);
 				}
-				if(responseData.Total === responseData.Sent){
+				if(responseData.Total === (responseData.Synced - responseData.Seen)){
 					this.isCompleted = true;
 					clearInterval(this.checkProgressInterval);
 				}
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					}
 				}
 
-				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "/100%" : "";
+				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "%" : "";
 				document.querySelector('#uploadSyncedCount').innerHTML = syncedString;
 
 				document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? "width: "+ status.Received + "%" : "");
