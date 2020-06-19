@@ -8,10 +8,26 @@
 		- other?
 	- browse fails ()
 - font awesome attributions
+- mobile theme
+- on click upload button opens select file dialogue
+- annotate bars on rhs
+
+- get rid of seen for now
+
+
+- i
+	- received (uploaded)
+	- split (split through the chunker)
+	- stored (stored in the local store)
+	- sent (sent to other peers in the network)
+	- synced (proof of custody received and retrievable from the network)
+	- seen (these chunks were already know by the local node)
+
+
+
 - browse handle different situations
 	- bzz-raw is file (download)
 	- bzz-raw is manifest
 		- is one file, navigate to file
 		- is manifest of multiple files
-			- show bzz-list (improve styling)
-- monile theme
+			- show bzz-list (improve styling)	

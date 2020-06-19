@@ -1,0 +1,6 @@
+1. amend header if needed
+2. copy from body tag to begin content
+3. copy from end content to body tag
+4. copy index.js except gateway declaration
+5. copy index.css
+6. ensure all indents are tabs
