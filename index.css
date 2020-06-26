@@ -9,13 +9,13 @@
 
 .fades{
 	opacity: 1;	
-	transition: opacity 0.1s;
+	transition: opacity 0.01s;
 }
 
 .fadeOut{
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 0.1s;
+	transition: opacity 0.01s;
 }
 
 
@@ -166,7 +166,7 @@ a{
 }
 
 .controlMain button {
-	transition: opacity 0.1s;
+	transition: opacity 0.01s;
 	cursor: pointer;
 	position: relative;
 	font-size: 20px;
@@ -197,7 +197,7 @@ a{
 	border-radius: 9px;
 	height: 40px;
 	opacity:0;
-	transition: opacity 0.3s;
+	transition: opacity 0.03s;
 }
 
 
@@ -210,7 +210,7 @@ a{
 
 .controlMain button.orangeButton.fadeOut {
 	opacity: 0.2;
-	transition: opacity 0.2s;
+	transition: opacity 0.02s;
 }
 
 
@@ -221,7 +221,7 @@ a{
 .controlMain button.orangeButton:hover:after {
 	border: 1px solid #FFA500;
 	opacity: 0.5;
-	transition: opacity 0.1s;
+	transition: opacity 0.01s;
 }
 
 .controlMain .uploadAction button{
@@ -247,7 +247,7 @@ a{
 .controlMain button.uploadCancelButton:hover:after {
 	border: 1px solid #8c8c8c;
 	opacity: 0.5;
-	transition: opacity 0.1s;
+	transition: opacity 0.01s;
 }
 
 #uploadForm{
@@ -371,7 +371,7 @@ a{
 	height: 11px;
 	margin-bottom: 2px;
 	z-index: 1;
-	transition: width 0.1s;
+	transition: width 0.01s;
 	width: 0;
 }
 

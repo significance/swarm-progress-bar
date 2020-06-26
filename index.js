@@ -1,5 +1,5 @@
-// let gatewayHost = 'http://localhost:8500';
-let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
+let gatewayHost = 'http://swarm-gateways.net';
+// let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
 
 
 // let gatewayHost = window.location.protocol+"//"+window.location.hostname+(window.location.port ? ":"+window.location.port : "");
@@ -8,21 +8,16 @@ class SwarmProgressBar {
 	constructor(gateway){
 		this.gateway = gateway;
 		this.uploadProgressPercent = 0;
-		this.tagId = false;
-		this.pollEvery = 1 * 1000;
-		this.checkInterval = false;
+		// this.tagId = false;
+		// this.pollEvery = 1 * 1000;
+		// this.checkInterval = false;
 		this.onProgressCallback = false;
-		this.onErrorCallback = false;
-		this.onStartCallback = false;
+		// this.onErrorCallback = false;
+		// this.onStartCallback = false;
 
 		this.status = {
 			Total: false,
 			Received: false,
-			Seen: false,
-			Sent: false,
-			Split: false,
-			Stored: false,
-			Synced: false,
 			Complete: true,
 			swarmHash: false,
 			gatewayLink: false
@@ -38,68 +33,69 @@ class SwarmProgressBar {
 	}
 
 	upload(formData) {
-		this.startCheckProgress();
+		// this.startCheckProgress();
 
-		let url = this.gateway + '/bzz:/';
+		let url = 'http://127.0.0.1:8080/files';
 
-		let uploadURL = url + '?defaultpath=' + formData.get('file').name;
-
-		return this.sendUploadRequest(uploadURL, 'POST', 'text', formData, formData.get('file').size).then((response) => {
-			let swarmHash = response.responseText;
+		// let uploadURL = url + '?defaultpath=' + formData.get('file').name;
+		return this.sendUploadRequest(url, 'POST', 'application/json', formData, formData.get('file').size).then((swarmHash) => {
 			this.setStatus({swarmHash: swarmHash});  
-			this.setStatus({gatewayLink: url + swarmHash + "/" + formData.get('file').name});
-			this.tagId = response.getResponseHeader('x-swarm-tag');
-			this.onUploadedCallback(response);
+			this.setStatus({gatewayLink: url + "/" + swarmHash});
+			// this.tagId = response.getResponseHeader('x-swarm-tag');
+			this.onUploadedCallback(swarmHash);
 		}).catch((error) => {
 			throw new Error(error);
 		});
 	}
 
-	startCheckProgress(){
-		this.checkProgressInterval = setInterval(()=>{
-			this.checkProgress();
-		}, this.pollEvery);
-		this.checkProgress();
-	}
+	// startCheckProgress(){
+	// 	this.checkProgressInterval = setInterval(()=>{
+	// 		this.checkProgress();
+	// 	}, this.pollEvery);
+	// 	this.checkProgress();
+	// }
 
-	checkProgress(){
-		let responseData;
-		if(this.tagId !== false){
-			let url = this.gateway + '/bzz-tag:/?Id=' + this.tagId;
-			return this.sendRequest(url, 'GET', 'json').then((response) => {
-				if(response.responseText){
-					responseData = JSON.parse(response.responseText);
-					this.setStatus({
-						Total: responseData.Total,
-						Seen: responseData.Seen,
-						Sent: responseData.Sent,
-						Split: responseData.Split,
-						Stored: responseData.Stored,
-						Synced: responseData.Synced
-					});
-				}
-				if(this.onProgressCallback){
-					this.onProgressCallback(this.status);
-				}
-				if(responseData.Total === (responseData.Synced - responseData.Seen)){
-					this.isCompleted = true;
-					clearInterval(this.checkProgressInterval);
-				}
-			}).catch((error) => {
-				this.isErrored = true;
-				clearInterval(this.checkProgressInterval);
-				throw new Error(error);
-			});
-		}else{
-			if(this.onProgressCallback){
-				this.isErrored = true;
-				this.onProgressCallback(this.status);
-			}
-		}
-	}
+	// checkProgress(){
+	// 	let responseData;
+	// 	if(this.tagId !== false){
+	// 		let url = this.gateway + '/bzz-tag:/?Id=' + this.tagId;
+	// 		return this.sendRequest(url, 'GET', 'json').then((response) => {
+	// 			if(response.responseText){
+	// 				responseData = JSON.parse(response.responseText);
+	// 				this.setStatus({
+	// 					Total: responseData.Total,
+	// 					Seen: responseData.Seen,
+	// 					Sent: responseData.Sent,
+	// 					Split: responseData.Split,
+	// 					Stored: responseData.Stored,
+	// 					Synced: responseData.Synced
+	// 				});
+	// 			}
+	// 			if(this.onProgressCallback){
+	// 				this.onProgressCallback(this.status);
+	// 			}
+	// 			if(responseData.Total === (responseData.Synced - responseData.Seen)){
+	// 				this.isCompleted = true;
+	// 				clearInterval(this.checkProgressInterval);
+	// 			}
+	// 		}).catch((error) => {
+	// 			this.isErrored = true;
+	// 			clearInterval(this.checkProgressInterval);
+	// 			throw new Error(error);
+	// 		});
+	// 	}else{
+	// 		if(this.onProgressCallback){
+	// 			this.isErrored = true;
+	// 			this.onProgressCallback(this.status);
+	// 		}
+	// 	}
+	// }
 
 	sendUploadRequest(url, requestType, responseType = 'text', data, dataLength) {
+		this.setStatus({Total: dataLength});
+
 		return new Promise((resolve,reject) => {
+
 			let xhr = new XMLHttpRequest();
 
 			xhr.onloadstart = () => {
@@ -110,29 +106,22 @@ class SwarmProgressBar {
 
 			xhr.onreadystatechange = function(){   
 				if(xhr.readyState === 4 && xhr.status === 200){
-					resolve(xhr);  
+					resolve(xhr.response.reference);
 				}
 			}
 
-			xhr.upload.onprogress = (event) => {
-				let received;
-				if(event.loaded > dataLength){
-					received = 100;
-				}else{
-					received = Math.floor((event.loaded/dataLength) * 100, 2);
-				}
-				this.setStatus({Received: received});
-			};
+			xhr.upload.onprogress = this.onProgressCallback;
 
 			xhr.onerror = (error) => {
+				console.log(error)
 				reject(error);
 			};
 
-			xhr.open(requestType, url, true);
-
-			xhr.setRequestHeader('Accept', responseType);
-
+			xhr.open('POST', url, true);
+			xhr.responseType = 'json';
+			
 			xhr.send(data);
+
 		});
 
 	}
@@ -188,7 +177,7 @@ let humanFileSize = (size) => {
 };
 
 
-let fadeAndReplace = (selector, content, time=600) => {
+let fadeAndReplace = (selector, content, time=0) => {
 	let element = document.querySelector(selector);
 	element.classList.add("fades");
 	element.classList.add("fadeOut");
@@ -216,7 +205,7 @@ let components = [
 	['#controlHeaderInfo','#uploadFeedbackComponent']
 ];
 
-let fadeInComponent = (headerSelectorIn, selectorIn, time=600) => {
+let fadeInComponent = (headerSelectorIn, selectorIn, time=100) => {
 	let elementIn = document.querySelector(selectorIn);
 	let headerIn = document.querySelector(headerSelectorIn);
 
@@ -245,7 +234,7 @@ let fadeInComponent = (headerSelectorIn, selectorIn, time=600) => {
 		elementIn.classList.remove("hidden");
 		setTimeout(()=>{   
 			elementIn.classList.remove("fadeOut");
-		},200);
+		},0);
 	}, time);
 };
 
@@ -327,37 +316,41 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(formData.get('file')){
 			swb = new SwarmProgressBar(gatewayHost);
 			currentProgressBar = swb;
-			swb.onProgress((status)=>{
-				let totalLength = status.Total.toString().length;
-				let syncedString = "";
-				let syncedPercent = 0;
+			swb.onProgress((st)=>{
+				console.log(st)
+				// let totalLength = status.Total.toString().length;
+				// let syncedString = "";
+				// let syncedPercent = 0;
+				let received = Math.floor(st.loaded / swb.status.Total)*100;
+				swb.setStatus({Received: received});
+				console.log(swb.status)
 
-				if(
-					status.Synced !== false &&
-					status.Total !== false && 
-					status.Seen !== false
-				){
 
-					if(status.Total - status.Seen > 0){
-						syncedPercent = Math.ceil((status.Synced/(status.Total - status.Seen)) * 100, 2);				
-					}else{
-						syncedPercent = 100;
-					}
+				// if(
+				// 	status.Synced !== false &&
+				// 	status.Total !== false && 
+				// 	status.Seen !== false
+				// ){
 
-					if(
-						status.Total - ( status.Synced + status.Seen ) > 0
-					){
-						syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
-					}else{
-						syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
-					}
-				}
+				// 	if(status.Total - status.Seen > 0){
+				// 		syncedPercent = Math.ceil((status.Synced/(status.Total - status.Seen)) * 100, 2);				
+				// 	}else{
+				// 		syncedPercent = 100;
+				// 	}
 
-				document.querySelector('#uploadReceivedCount').innerHTML = status.Received !== false ? padNumber(status.Received, 3) + "%" : "";
-				document.querySelector('#uploadSyncedCount').innerHTML = syncedString;
+				// 	if(
+				// 		status.Total - ( status.Synced + status.Seen ) > 0
+				// 	){
+				// 		syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
+				// 	}else{
+				// 		syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
+				// 	}
+				// }
+				document.querySelector('#uploadReceivedCount').innerHTML = swb.status.Received !== false ? padNumber(swb.status.Received, 3) + "%" : "";
+				// document.querySelector('#uploadSyncedCount').innerHTML = syncedString;
 
-				document.querySelector('#uploadReceivedBar').setAttribute('style', status.Received !== false ? "width: "+ status.Received + "%" : "");
-				document.querySelector('#uploadSyncedBar').setAttribute('style', status.Synced !== false ? "width: "+ syncedPercent + "%" : "");
+				document.querySelector('#uploadReceivedBar').setAttribute('style', swb.status.Received !== false ? "width: "+ swb.status.Received + "%" : "");
+				// document.querySelector('#uploadSyncedBar').setAttribute('style', status.Synced !== false ? "width: "+ syncedPercent + "%" : "");
 			});
 			swb.onStart((event)=>{
 				fadeInComponent(false, '#uploadFeedbackComponent')
