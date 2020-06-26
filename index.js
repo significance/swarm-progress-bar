@@ -1,24 +1,18 @@
-let gatewayHost = 'http://swarm-gateways.net';
-// let gatewayHost = 'https://swarm-0-elad.stg.swarm-gateways.net';
-
-
-// let gatewayHost = window.location.protocol+"//"+window.location.hostname+(window.location.port ? ":"+window.location.port : "");
+let gatewayHost = 'http://localhost:8080'
 
 class SwarmProgressBar {
 	constructor(gateway){
 		this.gateway = gateway;
 		this.uploadProgressPercent = 0;
-		// this.tagId = false;
-		// this.pollEvery = 1 * 1000;
-		// this.checkInterval = false;
+
 		this.onProgressCallback = false;
-		// this.onErrorCallback = false;
-		// this.onStartCallback = false;
+		this.onErrorCallback = false;
+		this.onStartCallback = false;
 
 		this.status = {
 			Total: false,
 			Received: false,
-			Complete: true,
+			Complete: false,
 			swarmHash: false,
 			gatewayLink: false
 		};
@@ -33,63 +27,17 @@ class SwarmProgressBar {
 	}
 
 	upload(formData) {
-		// this.startCheckProgress();
 
-		let url = 'http://127.0.0.1:8080/files';
+		let url = this.gateway+'/files';
 
-		// let uploadURL = url + '?defaultpath=' + formData.get('file').name;
 		return this.sendUploadRequest(url, 'POST', 'application/json', formData, formData.get('file').size).then((swarmHash) => {
 			this.setStatus({swarmHash: swarmHash});  
 			this.setStatus({gatewayLink: url + "/" + swarmHash});
-			// this.tagId = response.getResponseHeader('x-swarm-tag');
 			this.onUploadedCallback(swarmHash);
 		}).catch((error) => {
 			throw new Error(error);
 		});
 	}
-
-	// startCheckProgress(){
-	// 	this.checkProgressInterval = setInterval(()=>{
-	// 		this.checkProgress();
-	// 	}, this.pollEvery);
-	// 	this.checkProgress();
-	// }
-
-	// checkProgress(){
-	// 	let responseData;
-	// 	if(this.tagId !== false){
-	// 		let url = this.gateway + '/bzz-tag:/?Id=' + this.tagId;
-	// 		return this.sendRequest(url, 'GET', 'json').then((response) => {
-	// 			if(response.responseText){
-	// 				responseData = JSON.parse(response.responseText);
-	// 				this.setStatus({
-	// 					Total: responseData.Total,
-	// 					Seen: responseData.Seen,
-	// 					Sent: responseData.Sent,
-	// 					Split: responseData.Split,
-	// 					Stored: responseData.Stored,
-	// 					Synced: responseData.Synced
-	// 				});
-	// 			}
-	// 			if(this.onProgressCallback){
-	// 				this.onProgressCallback(this.status);
-	// 			}
-	// 			if(responseData.Total === (responseData.Synced - responseData.Seen)){
-	// 				this.isCompleted = true;
-	// 				clearInterval(this.checkProgressInterval);
-	// 			}
-	// 		}).catch((error) => {
-	// 			this.isErrored = true;
-	// 			clearInterval(this.checkProgressInterval);
-	// 			throw new Error(error);
-	// 		});
-	// 	}else{
-	// 		if(this.onProgressCallback){
-	// 			this.isErrored = true;
-	// 			this.onProgressCallback(this.status);
-	// 		}
-	// 	}
-	// }
 
 	sendUploadRequest(url, requestType, responseType = 'text', data, dataLength) {
 		this.setStatus({Total: dataLength});
@@ -244,7 +192,7 @@ let goToPage = () => {
   if (page == "") {
 	return false;
   }
-  var address = "/bzz:/" + page;
+  var address = gatewayHost + "/files/" + page;
   location.href = address;
 }
 
@@ -317,40 +265,12 @@ document.addEventListener('DOMContentLoaded', function(){
 			swb = new SwarmProgressBar(gatewayHost);
 			currentProgressBar = swb;
 			swb.onProgress((st)=>{
-				console.log(st)
-				// let totalLength = status.Total.toString().length;
-				// let syncedString = "";
-				// let syncedPercent = 0;
 				let received = Math.floor(st.loaded / swb.status.Total)*100;
 				swb.setStatus({Received: received});
-				console.log(swb.status)
 
-
-				// if(
-				// 	status.Synced !== false &&
-				// 	status.Total !== false && 
-				// 	status.Seen !== false
-				// ){
-
-				// 	if(status.Total - status.Seen > 0){
-				// 		syncedPercent = Math.ceil((status.Synced/(status.Total - status.Seen)) * 100, 2);				
-				// 	}else{
-				// 		syncedPercent = 100;
-				// 	}
-
-				// 	if(
-				// 		status.Total - ( status.Synced + status.Seen ) > 0
-				// 	){
-				// 		syncedString = 'Syncing <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
-				// 	}else{
-				// 		syncedString = 'Synced <span class="uploadFeedbackCountNumbers">'+syncedPercent+'%</span>';
-				// 	}
-				// }
 				document.querySelector('#uploadReceivedCount').innerHTML = swb.status.Received !== false ? padNumber(swb.status.Received, 3) + "%" : "";
-				// document.querySelector('#uploadSyncedCount').innerHTML = syncedString;
 
 				document.querySelector('#uploadReceivedBar').setAttribute('style', swb.status.Received !== false ? "width: "+ swb.status.Received + "%" : "");
-				// document.querySelector('#uploadSyncedBar').setAttribute('style', status.Synced !== false ? "width: "+ syncedPercent + "%" : "");
 			});
 			swb.onStart((event)=>{
 				fadeInComponent(false, '#uploadFeedbackComponent')
